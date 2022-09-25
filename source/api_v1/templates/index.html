@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<body>
+<div class="container">
+    <div class="my-3">
+        <label for="number1" class="form-label">Number 1</label>
+        <input type="number" class="form-control w-50" id="number1" placeholder="Enter number 1">
+    </div>
+    <div class="mb-3">
+        <label for="number2" class="form-label">Number 2</label>
+        <input type="number" class="form-control w-50" id="number2" placeholder="Enter number 2">
+    </div>
+
+    <div class="btn-group" role="group" aria-label="Basic outlined example">
+        <button id="addBtn" type="button" class="btn btn-outline-primary">Add</button>
+        <button id='subBtn' type="button" class="btn btn-outline-primary">Subtract</button>
+        <button id='multiBtn' type="button" class="btn btn-outline-primary">Multiply</button>
+        <button id='divBtn' type="button" class="btn btn-outline-primary">Divide</button>
+    </div>
+    <div id="result" class="alert alert-light" role="alert">
+        Result:
+    </div>
+</div>
+<script>
+    const csrftoken = getCookie('csrftoken');
+    async function onClick(url) {
+        let number1 = document.getElementById('number1').value;
+        let number2 = document.getElementById('number2').value;
+        let data = {
+            "A": number1,
+            "B": number2
+        }
+        let response = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            }
+        })
+        let result = document.getElementById('result')
+        if (response.status === 200) {
+
+            result.style.color = 'black'
+            let answer = await response.json()
+            result.innerHTML = `Result: ${answer.answer}`
+        } else {
+            result.style.color = 'black'
+            let answer = await response.json()
+            result.innerHTML = `Error: ${answer.error}`
+        }
+    }
+    async function onClickAdd() {
+        await getCsrfToken()
+        let url = "http://127.0.0.1:8000/api/v1/add/"
+        await onClick(url)
+    }
+    async function onClickSub() {
+        await getCsrfToken()
+        let url = "http://127.0.0.1:8000/api/v1/subtract/"
+        await onClick(url)
+    }
+    async function onClickMulti() {
+        await getCsrfToken()
+        let url = "http://127.0.0.1:8000/api/v1/multiply/"
+        await onClick(url)
+    }
+    async function onClickDiv() {
+        await getCsrfToken()
+        let url = "http://127.0.0.1:8000/api/v1/divide/"
+        await onClick(url)
+    }
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    async function getCsrfToken() {
+        let url = "http://127.0.0.1:8000/api/v1/get-csrf-token/"
+        await fetch(url);
+    }
+    function onLoad() {
+        let addBtn = document.getElementById('addBtn');
+        let subBtn = document.getElementById('subBtn');
+        let multiBtn = document.getElementById('multiBtn');
+        let divBtn = document.getElementById('divBtn')
+        addBtn.addEventListener('click', onClickAdd);
+        subBtn.addEventListener('click', onClickSub);
+        multiBtn.addEventListener('click', onClickMulti);
+        divBtn.addEventListener('click', onClickDiv);
+    }
+    window.onload = onLoad()
+</script>
+</body>
+</html>
